@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as readline from 'readline'; // TODO: install node
+import * as readline from 'readline';
 import { Client } from '../taipa/src/client';
 import { graphAnalyzeTonal } from '../taipa/src/tonal/analyzer';
 import {
