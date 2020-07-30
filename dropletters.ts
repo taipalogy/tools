@@ -12,10 +12,10 @@ import { AlphabeticGrapheme } from '../taipa/src/unit';
  * drop one letter of stop finals for the third and fifth checked tones.
  */
 
-let path = '../markdowns/output.md';
+let path = './markdowns/output.md';
 
 const readInterface = readline.createInterface(
-  fs.createReadStream('../markdowns/example.md')
+  fs.createReadStream('./markdowns/example.md')
 );
 
 fs.appendFileSync(path, '', {
@@ -46,12 +46,16 @@ readInterface.on('line', (l: string) => {
             return it;
           }
         });
+        const idx = l.indexOf(tok);
+        const len = tok.length;
+        const head = l.slice(0, idx);
+        const tail = l.slice(idx + len);
         // console.log(gsAfter);
-        aLine += gsAfter.map(it => it.letter.literal).join('');
-      } else {
-        aLine += tok;
+        aLine = head + gsAfter.map(it => it.letter.literal).join('') + tail;
       }
     }
+  } else {
+    aLine = l;
   }
   buffer.push(aLine);
 });
