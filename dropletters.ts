@@ -7,6 +7,7 @@ import {
   lowerLettersTonal,
 } from '../taipa/src/tonal/version2';
 import { AlphabeticGrapheme } from '../taipa/src/unit';
+import { eighthToFourthFinals } from '../taipa/src/tonal/collections';
 
 /**
  * drop one letter of stop finals for the third and fifth checked tones.
@@ -32,30 +33,40 @@ readInterface.on('line', (l: string) => {
   if (tokens) {
     for (const tok of tokens) {
       const gs = graphAnalyzeTonal(tok);
-      // console.log(gs)
-      const thirdsFifths = gs.filter(
-        it => it.letter.literal === TonalLetterTags.hh
+      const checkedFinals = gs.filter(it =>
+        eighthToFourthFinals.has(it.letter.literal)
       );
-      if (thirdsFifths.length > 0) {
+      const thirdFifthTonals = gs.filter(
+        it =>
+          it.letter.literal === TonalLetterTags.x ||
+          it.letter.literal === TonalLetterTags.w
+      );
+      if (checkedFinals.length > 0 && thirdFifthTonals.length > 0) {
         const gsAfter = gs.map(it => {
-          if (it.letter.literal === TonalLetterTags.hh) {
-            return new AlphabeticGrapheme(
-              lowerLettersTonal.get(TonalLetterTags.h)
-            );
+          const got = eighthToFourthFinals.get(it.letter.literal);
+          if (got) {
+            return new AlphabeticGrapheme(lowerLettersTonal.get(got));
           } else {
             return it;
           }
         });
-        const idx = l.indexOf(tok);
+        let idx = 0;
         const len = tok.length;
-        const head = l.slice(0, idx);
-        const tail = l.slice(idx + len);
-        // console.log(gsAfter);
+        let head = '';
+        let tail = '';
+
+        if (aLine.length == 0) {
+          idx = l.indexOf(tok);
+          head = l.slice(0, idx);
+          tail = l.slice(idx + len);
+        } else if (aLine.length > 0) {
+          idx = aLine.indexOf(tok);
+          head = aLine.slice(0, idx);
+          tail = aLine.slice(idx + len);
+        }
         aLine = head + gsAfter.map(it => it.letter.literal).join('') + tail;
       }
     }
-  } else {
-    aLine = l;
   }
   buffer.push(aLine);
 });
