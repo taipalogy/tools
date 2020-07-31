@@ -2,13 +2,8 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 
 import { Client } from '../taipa/src/client';
-import { graphAnalyzeTonal } from '../taipa/src/tonal/analyzer';
-import {
-  TonalLetterTags,
-  lowerLettersTonal,
-  TonalSoundTags,
-} from '../taipa/src/tonal/version2';
-import { AlphabeticGrapheme, Sound, AlphabeticLetter } from '../taipa/src/unit';
+import { lowerLettersTonal, TonalSoundTags } from '../taipa/src/tonal/version2';
+import { AlphabeticLetter } from '../taipa/src/unit';
 import { eighthToFourthFinals } from '../taipa/src/tonal/collections';
 import { TonalSyllable } from '../taipa/src/tonal/morpheme';
 
