@@ -1,19 +1,22 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
+
 import { Client } from '../taipa/src/client';
 import { graphAnalyzeTonal } from '../taipa/src/tonal/analyzer';
 import {
   TonalLetterTags,
   lowerLettersTonal,
+  TonalSoundTags,
 } from '../taipa/src/tonal/version2';
-import { AlphabeticGrapheme } from '../taipa/src/unit';
+import { AlphabeticGrapheme, Sound, AlphabeticLetter } from '../taipa/src/unit';
 import { eighthToFourthFinals } from '../taipa/src/tonal/collections';
+import { TonalSyllable } from '../taipa/src/tonal/morpheme';
 
 /**
  * drop one letter of stop finals for the third and fifth checked tones.
  */
 
-let path = './markdowns/output.md';
+const path = './markdowns/output.md';
 
 const readInterface = readline.createInterface(
   fs.createReadStream('./markdowns/example.md')
@@ -32,24 +35,34 @@ readInterface.on('line', (l: string) => {
   const tokens = l.match(/\w+/g);
   if (tokens) {
     for (const tok of tokens) {
-      const gs = graphAnalyzeTonal(tok);
-      const checkedFinals = gs.filter(it =>
-        eighthToFourthFinals.has(it.letter.literal)
-      );
-      const thirdFifthTonals = gs.filter(
-        it =>
-          it.letter.literal === TonalLetterTags.x ||
-          it.letter.literal === TonalLetterTags.w
-      );
-      if (checkedFinals.length > 0 && thirdFifthTonals.length > 0) {
-        const gsAfter = gs.map(it => {
-          const got = eighthToFourthFinals.get(it.letter.literal);
+      // const gs = graphAnalyzeTonal(tok);
+      const seqs = cli.processTonal(tok).soundSequences;
+      // console.log(seqs);
+      const syls: TonalSyllable[] = [];
+      for (let seq of seqs) {
+        let s: TonalSyllable = new TonalSyllable(
+          seq.map(it => new AlphabeticLetter(it.characters))
+        );
+        const fnls = seq.filter(it => it.name === TonalSoundTags.stopFinal);
+        const tnls = seq.filter(it => it.name === TonalSoundTags.checkedTonal);
+        if (fnls.length == 1 && tnls.length == 1) {
+          const got = eighthToFourthFinals.get(fnls[0].toString());
           if (got) {
-            return new AlphabeticGrapheme(lowerLettersTonal.get(got));
-          } else {
-            return it;
+            s.popLetter(); // pop the tonal
+            s.popLetter(); // pop the final
+            s.pushLetter(lowerLettersTonal.get(got)); // push the new final
+            s.pushLetter(lowerLettersTonal.get(tnls[0].toString())); // push back the tonal
+
+            syls.push(s);
           }
-        });
+        } else {
+          syls.push(s);
+        }
+      }
+      const word = seqs.map(x => x.map(y => y.toString()).join('')).join('');
+      const wordAfter = syls.map(it => it.literal).join('');
+      // console.log(word, wordAfter);
+      if (word !== wordAfter) {
         let idx = 0;
         const len = tok.length;
         let head = '';
@@ -64,9 +77,11 @@ readInterface.on('line', (l: string) => {
           head = aLine.slice(0, idx);
           tail = aLine.slice(idx + len);
         }
-        aLine = head + gsAfter.map(it => it.letter.literal).join('') + tail;
+        aLine = head + wordAfter + tail;
       }
     }
+  } else {
+    aLine = l;
   }
   buffer.push(aLine);
 });
