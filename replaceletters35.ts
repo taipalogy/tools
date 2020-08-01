@@ -2,7 +2,11 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 
 import { Client } from '../taipa/src/client';
-import { lowerLettersTonal, TonalSoundTags } from '../taipa/src/tonal/version2';
+import {
+  lowerLettersTonal,
+  TonalSoundTags,
+  TonalLetterTags,
+} from '../taipa/src/tonal/version2';
 import { AlphabeticLetter } from '../taipa/src/unit';
 import { eighthToFourthFinals } from '../taipa/src/tonal/collections';
 import { TonalSyllable } from '../taipa/src/tonal/morpheme';
@@ -29,9 +33,9 @@ readInterface.on('line', (l: string) => {
   // tokenizer
   const tokens = l.match(/\w+/g);
   if (tokens) {
-    for (const tok of tokens) {
+    for (let i = 0; i < tokens.length; i++) {
       // const gs = graphAnalyzeTonal(tok);
-      const seqs = cli.processTonal(tok).soundSequences;
+      const seqs = cli.processTonal(tokens[i]).soundSequences;
       // console.log(seqs);
       const syls: TonalSyllable[] = [];
       for (let seq of seqs) {
@@ -39,7 +43,12 @@ readInterface.on('line', (l: string) => {
           seq.map(it => new AlphabeticLetter(it.characters))
         );
         const fnls = seq.filter(it => it.name === TonalSoundTags.stopFinal);
-        const tnls = seq.filter(it => it.name === TonalSoundTags.checkedTonal);
+        const tnls = seq.filter(
+          it =>
+            it.name === TonalSoundTags.checkedTonal &&
+            (it.toString() === TonalLetterTags.x ||
+              it.toString() === TonalLetterTags.w)
+        );
         if (fnls.length == 1 && tnls.length == 1) {
           const got = eighthToFourthFinals.get(fnls[0].toString());
           if (got) {
@@ -59,26 +68,29 @@ readInterface.on('line', (l: string) => {
       // console.log(word, wordAfter);
       if (word !== wordAfter) {
         let idx = 0;
-        const len = tok.length;
+        const len = tokens[i].length;
         let head = '';
         let tail = '';
 
         if (aLine.length == 0) {
-          idx = l.indexOf(tok);
+          idx = l.indexOf(tokens[i]);
           head = l.slice(0, idx);
           tail = l.slice(idx + len);
         } else if (aLine.length > 0) {
-          idx = aLine.indexOf(tok);
+          idx = aLine.indexOf(tokens[i]);
           head = aLine.slice(0, idx);
           tail = aLine.slice(idx + len);
         }
         aLine = head + wordAfter + tail;
       }
     }
+    if (aLine.length > 0 && aLine !== l) buffer.push(aLine);
+    else buffer.push(l);
   } else {
+    // console.log(l);
     aLine = l;
+    buffer.push(aLine);
   }
-  buffer.push(aLine);
 });
 
 readInterface.on('close', () => {
