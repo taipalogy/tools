@@ -10,7 +10,6 @@ import {
 import { AlphabeticLetter } from '../taipa/src/unit';
 import { eighthToFourthFinals } from '../taipa/src/tonal/collections';
 import { TonalSyllable } from '../taipa/src/tonal/morpheme';
-import { graphAnalyzeTonal } from '../taipa/src/tonal/analyzer';
 
 /**
  * drop one letter of stop finals for the third and fifth checked tones.
@@ -35,7 +34,6 @@ readInterface.on('line', (l: string) => {
   const tokens = l.match(/\w+/g);
   if (tokens) {
     for (let i = 0; i < tokens.length; i++) {
-      // const gs = graphAnalyzeTonal(tokens[i]);
       const seqs = cli.processTonal(tokens[i]).letterSequences;
       // console.log(seqs);
       const syls: TonalSyllable[] = [];
