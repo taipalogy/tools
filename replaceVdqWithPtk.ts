@@ -28,6 +28,8 @@ fs.appendFileSync(path, '', {
 const buffer: string[] = [];
 const cli = new Client();
 
+const stopWords: string[] = ['def'];
+
 const vdqToPtk = new Map<string, string>()
   .set(TonalLetterTags.v, TonalLetterTags.p)
   .set(TonalLetterTags.d, TonalLetterTags.t)
@@ -41,6 +43,8 @@ readInterface.on('line', (l: string) => {
     for (let i = 0; i < tokens.length; i++) {
       // const gs = graphAnalyzeTonal(tokens[i]);
       // console.log(tokens[i], gs.map(it => it.letter.literal).join(''));
+      // when the token is an english word or stop word, it should be skipped.
+      if (stopWords.includes(tokens[i])) continue;
       const seqs = cli.processTonal(tokens[i].toLowerCase()).letterSequences;
       // console.log(seqs);
       let isCapital: boolean[] = [];
