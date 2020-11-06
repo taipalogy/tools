@@ -8,7 +8,7 @@ import {
   TonalLetterTags,
 } from '../taipa/src/tonal/version2';
 import { AlphabeticLetter } from '../taipa/src/unit';
-import { eighthToFourthFinals } from '../taipa/src/tonal/collections';
+import { eighthToFourthFinalConsonants } from '../taipa/src/tonal/collections';
 import { TonalSyllable } from '../taipa/src/tonal/morpheme';
 
 /**
@@ -49,7 +49,7 @@ readInterface.on('line', (l: string) => {
               it.toString() === TonalLetterTags.w)
         );
         if (fnls.length == 1 && tnls.length == 1) {
-          const got = eighthToFourthFinals.get(fnls[0].toString());
+          const got = eighthToFourthFinalConsonants.get(fnls[0].toString());
           if (got) {
             s.popLetter(); // pop the tonal
             s.popLetter(); // pop the final
