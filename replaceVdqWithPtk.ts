@@ -13,6 +13,7 @@ import { graphAnalyzeTonal } from '../taipa/src/tonal/analyzer';
 
 /**
  * Replace letters v, d, and q with letters p, t, k. Replace letters p, t, and k with letters, ph, th, kh.
+ * Taipa v0.7.2
  */
 
 const path = './markdowns/output.md';
@@ -30,10 +31,16 @@ const cli = new Client();
 
 const stopWords: string[] = ['def'];
 
+const enum lettersVdq {
+  v = 'v',
+  d = 'd',
+  q = 'q',
+}
+
 const vdqToPtk = new Map<string, string>()
-  .set(TonalLetterTags.v, TonalLetterTags.p)
-  .set(TonalLetterTags.d, TonalLetterTags.t)
-  .set(TonalLetterTags.q, TonalLetterTags.k);
+  .set(lettersVdq.v, TonalLetterTags.p)
+  .set(lettersVdq.d, TonalLetterTags.t)
+  .set(lettersVdq.q, TonalLetterTags.k);
 
 readInterface.on('line', (l: string) => {
   let aLine = '';
@@ -46,7 +53,7 @@ readInterface.on('line', (l: string) => {
       // when the token is an english word or stop word, it should be skipped.
       if (stopWords.includes(tokens[i])) continue;
       const seqs = cli.processTonal(tokens[i].toLowerCase()).letterSequences;
-      // console.log(seqs);
+
       let isCapital: boolean[] = [];
       let len: number = -1; // length of all preceding letters
       const syls: TonalSyllable[] = [];
@@ -58,14 +65,14 @@ readInterface.on('line', (l: string) => {
         isCapital[j] = false; // defaulted as false
         const initsVdq = seqs[j].filter(
           it =>
-            it.name === TonalSpellingTags.initial &&
-            (it.toString() === TonalLetterTags.v ||
-              it.toString() === TonalLetterTags.d ||
-              it.toString() === TonalLetterTags.q)
+            it.name === TonalSpellingTags.initialConsonant &&
+            (it.toString() === lettersVdq.v ||
+              it.toString() === lettersVdq.d ||
+              it.toString() === lettersVdq.q)
         );
         const initsPtk = seqs[j].filter(
           it =>
-            it.name === TonalSpellingTags.initial &&
+            it.name === TonalSpellingTags.initialConsonant &&
             (it.toString() === TonalLetterTags.p ||
               it.toString() === TonalLetterTags.t ||
               it.toString() === TonalLetterTags.k)
