@@ -73,6 +73,12 @@ readInterface.on('line', (l: string) => {
             (it.toString() === TonalLetterTags.o ||
               it.toString() === TonalLetterTags.a)
         );
+        const medialOe = seqs[j].filter(
+          it =>
+            it.name === TonalSpellingTags.vowel &&
+            (it.toString() === TonalLetterTags.o ||
+              it.toString() === TonalLetterTags.e)
+        );
 
         len = seqs
           .map((val, k, arr) => (k < j ? val : []))
@@ -91,9 +97,12 @@ readInterface.on('line', (l: string) => {
           // console.log(`replacing with ${got} and get ${s.literal}`);
           syls.push(s);
         } else if (
-          medialOa.length == 2 &&
-          medialOa[0].toString() === TonalLetterTags.o &&
-          medialOa[1].toString() === TonalLetterTags.a
+          (medialOa.length == 2 &&
+            medialOa[0].toString() === TonalLetterTags.o &&
+            medialOa[1].toString() === TonalLetterTags.a) ||
+          (medialOe.length == 2 &&
+            medialOe[0].toString() === TonalLetterTags.o &&
+            medialOe[1].toString() === TonalLetterTags.e)
         ) {
           if (s.letters[0].literal === TonalLetterTags.o)
             s.replaceLetter(0, lowerLettersTonal.get(TonalLetterTags.u));
