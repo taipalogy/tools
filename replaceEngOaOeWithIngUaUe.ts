@@ -12,7 +12,7 @@ import { TonalSyllable } from '../taipa/src/tonal/morpheme';
 import { graphAnalyzeTonal } from '../taipa/src/tonal/analyzer';
 
 /**
- * Replace eng with ing, a.a.a. e to i when followed by an ng. Replace oa with ua.
+ * Replace eng with ing. Replace oa with ua, oai with uai, oe with ue.
  * Taipa v0.8.0
  */
 
@@ -100,6 +100,10 @@ readInterface.on('line', (l: string) => {
           (medialOa.length == 2 &&
             medialOa[0].toString() === TonalLetterTags.o &&
             medialOa[1].toString() === TonalLetterTags.a) ||
+          (medialOa.length == 3 &&
+            medialOa[0].toString() === TonalLetterTags.o &&
+            medialOa[1].toString() === TonalLetterTags.a &&
+            medialOa[1].toString() === TonalLetterTags.i) ||
           (medialOe.length == 2 &&
             medialOe[0].toString() === TonalLetterTags.o &&
             medialOe[1].toString() === TonalLetterTags.e)
