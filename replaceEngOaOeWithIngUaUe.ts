@@ -112,7 +112,7 @@ readInterface.on('line', (l: string) => {
             s.replaceLetter(0, lowerLettersTonal.get(TonalLetterTags.u));
           else if (s.letters[1].literal === TonalLetterTags.o)
             s.replaceLetter(1, lowerLettersTonal.get(TonalLetterTags.u));
-          // console.log(`replacing with ${initsPtk[0] + 'h'} and get ${s.literal}`);
+          // console.log(`replacing with ua and get ${s.literal}`);
           syls.push(s);
         } else {
           syls.push(s);
