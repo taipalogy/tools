@@ -8,8 +8,8 @@ import {
   TonalLetterTags,
 } from '../taipa/src/tonal/version2';
 import { AlphabeticLetter } from '../taipa/src/unit';
-import { TonalSyllable } from '../taipa/src/tonal/morpheme';
-import { graphAnalyzeTonal } from '../taipa/src/tonal/analyzer';
+import { TonalSyllable } from '../taipa/src/unchange/morpheme';
+import { graphAnalyzeTonal } from '../taipa/src/unchange/analyzer';
 
 /**
  * Replace eng with ing. Replace oa with ua, oai with uai, oe with ue.
