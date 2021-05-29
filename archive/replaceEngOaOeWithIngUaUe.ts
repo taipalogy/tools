@@ -8,8 +8,8 @@ import {
   TonalLetterTags,
 } from '../taipa/src/tonal/version2';
 import { AlphabeticLetter } from '../taipa/src/unit';
-import { TonalSyllable } from '../taipa/src/unchange/morpheme';
-import { graphAnalyzeTonal } from '../taipa/src/unchange/analyzer';
+import { TonalSyllable } from '../taipa/src/tonal/morpheme';
+// import { graphAnalyzeTonal } from '../taipa/src/unchange/analyzer';
 
 /**
  * Replace eng with ing. Replace oa with ua, oai with uai, oe with ue.
@@ -120,7 +120,7 @@ readInterface.on('line', (l: string) => {
       }
       const word = seqs.map(x => x.map(y => y.toString()).join('')).join('');
       const wordAfter = syls.map(it => it.literal).join('');
-      console.log(tokens[i], word, wordAfter);
+      // console.log(tokens[i], word, wordAfter);
       if (word !== wordAfter && tokens[i].length <= wordAfter.length) {
         let idx = 0;
         const len = tokens[i].length;

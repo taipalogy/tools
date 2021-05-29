@@ -65,14 +65,14 @@ readInterface.on('line', (l: string) => {
         isCapital[j] = false; // defaulted as false
         const initsVdq = seqs[j].filter(
           it =>
-            it.name === TonalSpellingTags.initialConsonant &&
+            it.name === TonalSpellingTags.initial &&
             (it.toString() === lettersVdq.v ||
               it.toString() === lettersVdq.d ||
               it.toString() === lettersVdq.q)
         );
         const initsPtk = seqs[j].filter(
           it =>
-            it.name === TonalSpellingTags.initialConsonant &&
+            it.name === TonalSpellingTags.initial &&
             (it.toString() === TonalLetterTags.p ||
               it.toString() === TonalLetterTags.t ||
               it.toString() === TonalLetterTags.k)
