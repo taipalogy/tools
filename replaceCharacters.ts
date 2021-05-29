@@ -133,6 +133,15 @@ readInterface.on('line', (l: string) => {
       }
 
       // eng -> ing
+      let indexEng = tok.search(regexEng);
+      while (indexEng != -1) {
+        const got = mapping.get(tok.substr(indexEng, 3));
+        if (got) {
+          tok = tok.replace(tok.substr(indexEng, 3), got);
+        }
+        // console.log(got, tok);
+        indexEng = tok.search(regexEng);
+      }
 
       const seqs = cli.processTonal(tokens[i].toLowerCase()).soundSequences;
 
