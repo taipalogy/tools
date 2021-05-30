@@ -2,14 +2,8 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 
 import { Client } from '../taipa/src/client';
-import {
-  lowerLettersTonal,
-  TonalSoundTags,
-  TonalLetterTags,
-} from '../taipa/src/tonal/version2';
-import { AlphabeticLetter } from '../taipa/src/unit';
-import { TonalSyllable } from '../taipa/src/unchange/unit';
-// import { graphAnalyzeTonal } from '../taipa/src/unchange/analyzer';
+import { TonalLetterTags } from '../taipa/src/tonal/version2';
+import { graphAnalyzeTonal } from '../taipa/src/unchange/analyzer';
 
 /**
  * Replace eng with ing. Replace oa with ua, oai with uai, oe with ue.
@@ -56,8 +50,6 @@ readInterface.on('line', (l: string) => {
   const tokens = l.match(/\w+/g);
   if (tokens) {
     for (let i = 0; i < tokens.length; i++) {
-      // const gs = graphAnalyzeTonal(tokens[i]);
-      // console.log(tokens[i], gs.map(it => it.letter.literal).join(''));
       // when the token is an english word or stop word, it should be skipped.
       if (stopWords.includes(tokens[i])) continue;
       let boolPtk = regexPtk.test(tokens[i].toLowerCase());
@@ -68,7 +60,7 @@ readInterface.on('line', (l: string) => {
 
       // ttw -> tw, ppw -> pw, kkw -> kw
       // ttx -> tx, ppx -> px, kkx -> kx
-      let tok = tokens[i].toLowerCase();
+      let tokenNew = tokens[i].toLowerCase();
       while (boolPtk && boolChecked35) {
         const indexPtk = tokens[i].toLowerCase().search(regexPtk);
         const index35 = tokens[i].toLowerCase().search(regexChecked35);
@@ -76,21 +68,21 @@ readInterface.on('line', (l: string) => {
         if (indexPtk == index35) {
           const got = mapping.get(tokens[i].toLowerCase().substr(index35, 3));
           if (got) {
-            tok = tokens[i]
+            tokenNew = tokens[i]
               .toLowerCase()
               .replace(tokens[i].toLowerCase().substr(index35, 3), got);
           }
           // console.log(got, tok);
         }
-        boolPtk = regexPtk.test(tok);
-        boolChecked35 = regexChecked35.test(tok);
+        boolPtk = regexPtk.test(tokenNew);
+        boolChecked35 = regexChecked35.test(tokenNew);
       }
 
       // initial. p -> ph, t -> th, k -> kh.
       const splited: string[] = [];
       let remained = '';
       let indexFywxzPtk = 0;
-      remained = tok.substr(indexFywxzPtk, tok.length);
+      remained = tokenNew.substr(indexFywxzPtk, tokenNew.length);
       indexFywxzPtk = remained.search(regexFywxzPtk);
       while (indexFywxzPtk != -1) {
         // console.log(tok, indexFywxzPtk, remained.match(regexFywxzPtk));
@@ -108,47 +100,52 @@ readInterface.on('line', (l: string) => {
           splited[i] = initial + TonalLetterTags.h + sliced;
         }
       }
-      tok = splited.join('');
+      tokenNew = splited.join('');
 
       // v -> p, d -> t, q -> k
-      let indexVdq = tok.search(regexVdq);
+      let indexVdq = tokenNew.search(regexVdq);
       while (indexVdq != -1) {
-        const got = mapping.get(tok.substr(indexVdq, 1));
+        const got = mapping.get(tokenNew.substr(indexVdq, 1));
         if (got) {
-          tok = tok.replace(tok.substr(indexVdq, 1), got);
+          tokenNew = tokenNew.replace(tokenNew.substr(indexVdq, 1), got);
         }
         // console.log(got, tok);
-        indexVdq = tok.search(regexVdq);
+        indexVdq = tokenNew.search(regexVdq);
       }
 
       // oa -> ua, oe -> ue
-      let indexOaoe = tok.search(regexOaoe);
+      let indexOaoe = tokenNew.search(regexOaoe);
       while (indexOaoe != -1) {
-        const got = mapping.get(tok.substr(indexOaoe, 2));
+        const got = mapping.get(tokenNew.substr(indexOaoe, 2));
         if (got) {
-          tok = tok.replace(tok.substr(indexOaoe, 2), got);
+          tokenNew = tokenNew.replace(tokenNew.substr(indexOaoe, 2), got);
         }
         // console.log(got, tok);
-        indexOaoe = tok.search(regexOaoe);
+        indexOaoe = tokenNew.search(regexOaoe);
       }
 
       // eng -> ing
-      let indexEng = tok.search(regexEng);
+      let indexEng = tokenNew.search(regexEng);
       while (indexEng != -1) {
-        const got = mapping.get(tok.substr(indexEng, 3));
+        const got = mapping.get(tokenNew.substr(indexEng, 3));
         if (got) {
-          tok = tok.replace(tok.substr(indexEng, 3), got);
+          tokenNew = tokenNew.replace(tokenNew.substr(indexEng, 3), got);
         }
         // console.log(got, tok);
-        indexEng = tok.search(regexEng);
+        indexEng = tokenNew.search(regexEng);
       }
+
+      // check if the new word can be analyzed
+      const gs = graphAnalyzeTonal(tokenNew);
+      console.log(tokens[i], gs.map(it => it.letter.literal).join(''));
 
       const seqs = cli.processTonal(tokens[i].toLowerCase()).soundSequences;
 
       const word = seqs.map(x => x.map(y => y.toString()).join('')).join('');
-      const wordAfter = tok;
-      console.log(tokens[i], wordAfter);
-      if (word !== wordAfter && tokens[i].length <= wordAfter.length) {
+      const wordNew = tokenNew;
+      console.log(tokens[i], wordNew);
+      if (word !== wordNew) {
+        console.log(word, wordNew);
         let idx = 0;
         const len = tokens[i].length;
         let head = '';
@@ -173,7 +170,7 @@ readInterface.on('line', (l: string) => {
         // console.log(wordAfterWCapital);
         if (wordAfterWCapital.length > 0)
           aLine = head + wordAfterWCapital + tail;
-        else aLine = head + tok + tail;
+        else aLine = head + tokenNew + tail;
       }
     }
     if (aLine.length > 0 && aLine !== l) buffer.push(aLine);
