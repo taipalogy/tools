@@ -137,15 +137,15 @@ readInterface.on('line', (l: string) => {
 
       // check if the new word can be analyzed
       const gs = graphAnalyzeTonal(tokenNew);
-      console.log(tokens[i], gs.map(it => it.letter.literal).join(''));
+      // console.log(tokens[i], gs.map(it => it.letter.literal).join(''));
 
       const seqs = cli.processTonal(tokens[i].toLowerCase()).soundSequences;
 
       const word = seqs.map(x => x.map(y => y.toString()).join('')).join('');
       const wordNew = tokenNew;
-      console.log(tokens[i], wordNew);
+      // console.log(tokens[i], wordNew);
       if (word !== wordNew) {
-        console.log(word, wordNew);
+        // console.log(word, wordNew);
         let idx = 0;
         const len = tokens[i].length;
         let head = '';
