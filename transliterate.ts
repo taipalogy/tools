@@ -38,7 +38,6 @@ stdin.addListener('data', function (data) {
       );
     }
   } else {
-    // e.g. node out/transliterate.js ../dictionaries/fromhangul.json
-    console.info('Usage: node path/to/transliterate.js from_lang.json');
+    console.info('Usage: node path/to/transliterate.js fromLang.json');
   }
 });
